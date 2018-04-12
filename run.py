@@ -1,19 +1,10 @@
 
 import os
-from flask import Flask
-# from backend import  db
-import backend
 import click
-from flask_sqlalchemy import SQLAlchemy
-db = SQLAlchemy()
-
-def create_app(config_name):
-    app = Flask(__name__)
-    app.config.from_object("config")
-    db.init_app(app)
+from myapp import create_app
+from myapp.model import db, Group
 
 
-    return app
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 
@@ -23,6 +14,11 @@ def initdb():
     """Initialize the database."""
     click.echo('Init the db')
     db.create_all()
+    if len(Group.query.filter_by(name="nogroup").all()) == 0:
+        nogroup = Group("nogroup")
+        db.session.add(nogroup)
+        db.session.commit()
+        click.echo('Init Table Group')
 
 
 if __name__ == "__main__":
