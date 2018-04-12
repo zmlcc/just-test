@@ -2,7 +2,7 @@
 import os
 import click
 from myapp import create_app
-from myapp.model import db, Group
+from myapp.model import db, Project
 
 
 
@@ -14,11 +14,7 @@ def initdb():
     """Initialize the database."""
     click.echo('Init the db')
     db.create_all()
-    if len(Group.query.filter_by(name="nogroup").all()) == 0:
-        nogroup = Group("nogroup")
-        db.session.add(nogroup)
-        db.session.commit()
-        click.echo('Init Table Group')
+
 
 
 if __name__ == "__main__":
