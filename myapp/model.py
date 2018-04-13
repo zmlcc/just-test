@@ -11,11 +11,14 @@ class User(db.Model):
     __tablename__='user'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
-    project = db.relationship("Project", secondary=prj_user, lazy='dynamic', 
-    backref=db.backref('user', lazy='dynamic'))
+    project = db.relationship("Project", secondary=prj_user, lazy='subquery', 
+    backref=db.backref('user', lazy='subquery'))
 
-    def __init__(self, username):
-        self.name = username
+    def __init__(self, name="NO_USER_NAME"):
+        self.name = name
+
+    def __repr__(self):
+        return 'u-{}'.format(self.name)
         
 
 class Project(db.Model):
@@ -23,7 +26,10 @@ class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
 
-    def __init__(self, name):
+    def __init__(self, name="NO_PROJECT_NAME"):
         self.name = name
+
+    def __repr__(self):
+        return 'prj-{}'.format(self.name)
 
 
