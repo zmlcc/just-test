@@ -18,7 +18,7 @@ class User(db.Model):
         self.name = name
 
     def __repr__(self):
-        return 'u-{}'.format(self.name)
+        return self.name
         
 
 class Project(db.Model):
@@ -30,6 +30,18 @@ class Project(db.Model):
         self.name = name
 
     def __repr__(self):
-        return 'prj-{}'.format(self.name)
+        return self.name
+
+class Cluster(db.Model):
+    __tablename__ = "cluster"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+
+    def __init__(self, name="NO_CLUSTER_NAME"):
+        self.name = name
+
+    def __repr__(self):
+        return self.name
+    
 
 
