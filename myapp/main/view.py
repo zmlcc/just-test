@@ -1,6 +1,7 @@
 from . import main
 
 from ..model import db, User, Project
+from ..principal import create_user_permission
 
 
 @main.route("/info")
@@ -9,6 +10,7 @@ def hello():
 
 
 @main.route("/user/<string:name>", methods=["POST"])
+@create_user_permission.require(404)
 def addUser(name):
     user = User(name)
     db.session().add(user)
