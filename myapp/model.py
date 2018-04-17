@@ -13,8 +13,8 @@ class Base(db.Model):
         server_onupdate=db.func.now())
 
 
-user_prj = db.Table(
-    "user_project",
+prj_user = db.Table(
+    "project_user",
     db.Column(
         "user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
     db.Column(
@@ -32,22 +32,42 @@ user_role = db.Table(
         "role_id", db.Integer, db.ForeignKey("role.id"), primary_key=True),
 )
 
+prj_cls = db.Table("project_cluster",
+                   db.Column(
+                       "project_id",
+                       db.Integer,
+                       db.ForeignKey("project.id"),
+                       primary_key=True),
+                   db.Column(
+                       "cluster_id",
+                       db.Integer,
+                       db.ForeignKey("cluster.id"),
+                       primary_key=True))
+
+
+user_cls = db.Table("user_cluster",
+                   db.Column(
+                       "user_id",
+                       db.Integer,
+                       db.ForeignKey("user.id"),
+                       primary_key=True),
+                   db.Column(
+                       "cluster_id",
+                       db.Integer,
+                       db.ForeignKey("cluster.id"),
+                       primary_key=True))
 
 class User(Base):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
-    project = db.relationship(
-        "Project",
-        secondary=user_prj,
-        lazy='subquery',
-        backref=db.backref('user', lazy='subquery'))
 
     role = db.relationship(
         "Role",
         secondary=user_role,
-        lazy="subquery",
-        backref=db.backref('user', lazy='subquery'))
+        lazy="selectin",
+        backref=db.backref('user', lazy='selectin'))
+
 
     def __init__(self, name="NO_USER_NAME"):
         self.name = name
@@ -60,6 +80,18 @@ class Project(Base):
     __tablename__ = 'project'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
+
+    user = db.relationship(
+        "User",
+        secondary=prj_user,
+        lazy='selectin',
+        backref=db.backref('project', lazy='selectin'))
+
+    cluster = db.relationship(
+        "Cluster",
+        secondary=prj_cls,
+        lazy='selectin',
+        backref=db.backref('project', lazy='selectin'))
 
     def __init__(self, name="NO_PROJECT_NAME"):
         self.name = name
@@ -77,8 +109,18 @@ class Cluster(Base):
         self.name = name
 
     def __repr__(self):
-        return self.name
+        return self.name 
 
+
+class Token(Base):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+
+    cluster_id = db.Column(db.Integer, db.ForeignKey('cluster.id')) 
+    cluster = db.relationship("Cluster")
+
+    def __repr__(self):
+        return self.name 
 
 class Role(Base):
     __tablename__ = "role"

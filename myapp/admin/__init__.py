@@ -1,7 +1,7 @@
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 
-from ..model import db, User, Project, Cluster, Role
+from ..model import db, User, Project, Cluster, Role, Token
 
 
 admin = Admin()
@@ -16,4 +16,5 @@ admin.add_view(MyModelViewBase(User, db.session))
 admin.add_view(MyModelViewBase(Project, db.session))
 admin.add_view(MyModelViewBase(Cluster, db.session))
 admin.add_view(MyModelViewBase(Role, db.session))
+admin.add_view(MyModelViewBase(Token, db.session))
 
