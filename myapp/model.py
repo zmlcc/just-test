@@ -32,30 +32,44 @@ user_role = db.Table(
         "role_id", db.Integer, db.ForeignKey("role.id"), primary_key=True),
 )
 
-prj_cls = db.Table("project_cluster",
-                   db.Column(
-                       "project_id",
-                       db.Integer,
-                       db.ForeignKey("project.id"),
-                       primary_key=True),
-                   db.Column(
-                       "cluster_id",
-                       db.Integer,
-                       db.ForeignKey("cluster.id"),
-                       primary_key=True))
+# prj_cls = db.Table("project_cluster",
+#                    db.Column(
+#                        "project_id",
+#                        db.Integer,
+#                        db.ForeignKey("project.id"),
+#                        primary_key=True),
+#                    db.Column(
+#                        "cluster_id",
+#                        db.Integer,
+#                        db.ForeignKey("cluster.id"),
+#                        primary_key=True))
 
 
-user_cls = db.Table("user_cluster",
-                   db.Column(
-                       "user_id",
-                       db.Integer,
-                       db.ForeignKey("user.id"),
-                       primary_key=True),
-                   db.Column(
-                       "cluster_id",
-                       db.Integer,
-                       db.ForeignKey("cluster.id"),
-                       primary_key=True))
+# user_cls = db.Table("user_cluster",
+#                    db.Column(
+#                        "user_id",
+#                        db.Integer,
+#                        db.ForeignKey("user.id"),
+#                        primary_key=True),
+#                    db.Column(
+#                        "cluster_id",
+#                        db.Integer,
+#                        db.ForeignKey("cluster.id"),
+#                        primary_key=True))
+
+class Cluster(Base):
+    __tablename__ = "cluster"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    ca = db.Column(db.Text(1000))
+    addr = db.Column(db.String(80))
+
+    def __init__(self, name="NO_CLUSTER_NAME"):
+        self.name = name
+
+    def __repr__(self):
+        return self.name 
+
 
 class User(Base):
     __tablename__ = 'user'
@@ -76,51 +90,6 @@ class User(Base):
         return self.name
 
 
-class Project(Base):
-    __tablename__ = 'project'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True)
-
-    user = db.relationship(
-        "User",
-        secondary=prj_user,
-        lazy='selectin',
-        backref=db.backref('project', lazy='selectin'))
-
-    cluster = db.relationship(
-        "Cluster",
-        secondary=prj_cls,
-        lazy='selectin',
-        backref=db.backref('project', lazy='selectin'))
-
-    def __init__(self, name="NO_PROJECT_NAME"):
-        self.name = name
-
-    def __repr__(self):
-        return self.name
-
-
-class Cluster(Base):
-    __tablename__ = "cluster"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True)
-
-    def __init__(self, name="NO_CLUSTER_NAME"):
-        self.name = name
-
-    def __repr__(self):
-        return self.name 
-
-
-class Token(Base):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True)
-
-    cluster_id = db.Column(db.Integer, db.ForeignKey('cluster.id')) 
-    cluster = db.relationship("Cluster")
-
-    def __repr__(self):
-        return self.name 
 
 class Role(Base):
     __tablename__ = "role"
@@ -132,3 +101,78 @@ class Role(Base):
 
     def __repr__(self):
         return self.name
+
+
+class Project(Base):
+    __tablename__ = 'project'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+
+    user = db.relationship(
+        "User",
+        secondary=prj_user,
+        lazy='selectin',
+        backref=db.backref('project', lazy='selectin'))
+
+    # cluster = db.relationship(
+    #     "Cluster",
+    #     secondary=prj_cls,
+    #     lazy='selectin',
+    #     backref=db.backref('project', lazy='selectin'))
+
+    def __init__(self, name="NO_PROJECT_NAME"):
+        self.name = name
+
+    def __repr__(self):
+        return self.name
+
+
+
+
+class Token(Base):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+
+    cluster_id = db.Column(db.Integer, db.ForeignKey('cluster.id')) 
+    cluster = db.relationship("Cluster")
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user = db.relationship("User")
+
+    info = db.Column(db.Text(1000))
+
+    def __repr__(self):
+        return self.name 
+
+
+
+ns_token = db.Table(
+    "namespace_token",
+    db.Column(
+        "namespace_id", db.Integer, db.ForeignKey("namespace.id"), primary_key=True),
+    db.Column(
+        "token_id",
+        db.Integer,
+        db.ForeignKey("token.id"),
+        primary_key=True),
+)
+
+
+class Namespace(Base):
+    id = db.Column(db.Integer, unique=True)
+
+    cluster_id = db.Column(db.Integer, db.ForeignKey('cluster.id'),  primary_key=True) 
+    cluster = db.relationship("Cluster")
+
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), primary_key=True)
+    project = db.relationship("Project")
+
+    token_id = db.Column(db.Integer, db.ForeignKey('token.id'))
+    token = db.relationship("Token")
+
+    def __repr__(self):
+        return self.name 
+
+
+    
+
