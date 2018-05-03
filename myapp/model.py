@@ -39,8 +39,9 @@ class Cluster(Base):
     __tablename__ = "cluster"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
-    ca = db.Column(db.Text(1000))
+    cert = db.Column(db.Text(1000))
     addr = db.Column(db.String(80))
+    access_token = db.Column(db.Text(1000))
 
     def __repr__(self):
         return self.name 
@@ -88,10 +89,11 @@ class Project(Base):
 
 
 
-class Token(Base):
+class Account(Base):
     id = db.Column(db.Integer, primary_key=True)
-    info = db.Column(db.Text(1000))
     # name = db.Column(db.String(80), unique=True)
+
+    token = db.Column(db.Text(1000))
 
     cluster_id = db.Column(db.Integer, db.ForeignKey('cluster.id')) 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -112,7 +114,7 @@ class Namespace(Base):
 
     cluster = db.relationship("Cluster")
     project = db.relationship("Project")
-    token = db.relationship("Token")
+    account = db.relationship("Account")
 
     def __repr__(self):
         return self.name 

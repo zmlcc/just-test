@@ -18,7 +18,8 @@ def load_identity_from_header():
     current_user = User.query.filter_by(name=user_name).first()
     if current_user is None:
         current_app.logger.info('add db username {}'.format(user_name))
-        user = User(user_name)
+        user = User()
+        user.name = user_name
         db.session().add(user)
         db.session().commit()
     else:

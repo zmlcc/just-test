@@ -1,10 +1,10 @@
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 
-from ..model import db, User, Project, Cluster, Role, Token, Namespace
+from ..model import db, User, Project, Cluster, Role, Account, Namespace
 
 
-admin = Admin()
+admin = Admin(url="/testf/admin")
 
 
 class BaseModelView(ModelView):
@@ -30,6 +30,6 @@ admin.add_view(ClusterView(Cluster, db.session))
 admin.add_view(UserView(User, db.session))
 admin.add_view(BaseModelView(Role, db.session))
 admin.add_view(ProjectView(Project, db.session))
-admin.add_view(BaseModelView(Token, db.session))
+admin.add_view(BaseModelView(Account, db.session))
 admin.add_view(BaseModelView(Namespace, db.session))
 

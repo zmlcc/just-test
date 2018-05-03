@@ -13,7 +13,7 @@ def create_app(config_name):
     db.init_app(app)
     admin.init_app(app)
     prin.init_app(app)
-    app.register_blueprint(main)
+    app.register_blueprint(main, url_prefix="/testf/")
     app.register_blueprint(testbp)
 
     return app

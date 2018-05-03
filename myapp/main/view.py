@@ -1,12 +1,27 @@
+from flask import jsonify
 from . import main
 
 from ..model import db, User, Project
 from ..principal import create_user_permission
 
+from ..k8sclient import get_cli
+from kubernetes.client import CoreV1Api
 
 @main.route("/info")
 def hello():
     return "Hello world!"
+
+
+@main.route("/hehe")
+def hehe():
+    cli = get_cli("a1")
+    if cli is None:
+        return "Not found cluster a1"
+    api = CoreV1Api(cli)
+    vv = api.list_namespaced_pod(namespace="prj-labu")
+    print(vv)
+    # print(type(vv))
+    return jsonify(vv.to_dict())
 
 
 @main.route("/user/<string:name>", methods=["POST"])
