@@ -2,6 +2,7 @@ from flask import Flask
 from .model import db
 from .main import main
 from .admin import admin
+from .api import api
 from .principal import prin
 from .testbp import testbp
 
@@ -15,6 +16,7 @@ def create_app(config_name):
     prin.init_app(app)
     app.register_blueprint(main, url_prefix="/testf/")
     app.register_blueprint(testbp)
+    app.register_blueprint(api, url_prefix="/api")
 
     return app
 
