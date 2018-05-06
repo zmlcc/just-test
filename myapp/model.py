@@ -55,8 +55,8 @@ class User(Base):
     role = db.relationship(
         "Role",
         secondary=user_role,
-        lazy="selectin",
-        backref=db.backref('user', lazy='selectin'))
+        lazy="select",
+        backref=db.backref('user', lazy='select'))
 
     def __repr__(self):
         return self.name
@@ -80,8 +80,8 @@ class Project(Base):
     user = db.relationship(
         "User",
         secondary=prj_user,
-        lazy='selectin',
-        backref=db.backref('project', lazy='selectin'))
+        lazy='select',
+        backref=db.backref('project', lazy='select'))
 
     def __repr__(self):
         return self.name

@@ -5,7 +5,7 @@ from ..model import db, Cluster
 
 from cerberus import Validator
 
-from sqlalchemy import exc
+
 
 
 @api.route("/cluster", methods=['GET'])

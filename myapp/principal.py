@@ -1,5 +1,6 @@
 from flask import request
 from flask import current_app
+from flask import g
 from flask_principal import Principal, Identity, RoleNeed, AnonymousIdentity, Permission
 from .model import db, User
 
@@ -11,6 +12,7 @@ create_user_permission = Permission(RoleNeed('create_user'))
 @prin.identity_loader
 def load_identity_from_header():
     user_name = request.headers.get("Remote-User", None)
+    g.cur_user_name = user_name
     current_app.logger.info('get username {}'.format(user_name))
     if user_name is None:
         return None
