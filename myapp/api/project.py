@@ -122,6 +122,7 @@ def create_namespace(prj, cluster):
     ns.cluster = cluster
 
     try:
+        Namespace
         db.session().add(ns)
         db.session().commit() 
     except exc.SQLAlchemyError as e:
