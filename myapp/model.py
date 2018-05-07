@@ -1,7 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import deferred
 
 db = SQLAlchemy()
-
 
 prj_user = db.Table(
     "project_user",
@@ -26,25 +27,32 @@ user_role = db.Table(
 class Base(db.Model):
     __abstract__ = True
 
-    gmt_create = db.Column(db.DateTime, server_default=db.func.now())
-    gmt_modified = db.Column(
-        db.DateTime,
-        server_default=db.func.now(),
-        server_onupdate=db.func.now())
+    @declared_attr
+    def gmt_create(cls):
+        return db.deferred(
+            db.Column(db.DateTime, server_default=db.func.now()))
 
+    # gmt_create = db.Column(db.DateTime, server_default=db.func.now())
 
+    @declared_attr
+    def gmt_modified(cls): 
+        return db.deferred(
+            db.Column(
+                db.DateTime,
+                server_default=db.func.now(),
+                server_onupdate=db.func.now()))
 
 
 class Cluster(Base):
     __tablename__ = "cluster"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
-    cert = db.Column(db.Text(1000))
     addr = db.Column(db.String(80))
-    access_token = db.Column(db.Text(1000))
+    cert = deferred(db.Column(db.Text(2048)))
+    access_token = deferred(db.Column(db.Text(2048)))
 
     def __repr__(self):
-        return self.name 
+        return self.name
 
 
 class User(Base):
@@ -60,7 +68,6 @@ class User(Base):
 
     def __repr__(self):
         return self.name
-
 
 
 class Role(Base):
@@ -87,38 +94,38 @@ class Project(Base):
         return self.name
 
 
-
-
 class Account(Base):
     id = db.Column(db.Integer, primary_key=True)
     # name = db.Column(db.String(80), unique=True)
 
     token = db.Column(db.Text(1000))
 
-    cluster_id = db.Column(db.Integer, db.ForeignKey('cluster.id')) 
+    cluster_id = db.Column(db.Integer, db.ForeignKey('cluster.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     namespace_id = db.Column(db.Integer, db.ForeignKey('namespace.id'))
 
     cluster = db.relationship("Cluster")
     user = db.relationship("User")
 
-
     def __repr__(self):
-        return "{}@{}".format(self.user.name, self.cluster.name) 
+        return "{}@{}".format(self.user.name, self.cluster.name)
 
 
 class Namespace(Base):
     id = db.Column(db.Integer, primary_key=True)
-    cluster_id = db.Column(db.Integer, db.ForeignKey('cluster.id'), unique=True, nullable=False) 
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), unique=True, nullable=False)
+    cluster_id = db.Column(
+        db.Integer, db.ForeignKey('cluster.id'),  nullable=False)
+    project_id = db.Column(
+        db.Integer, db.ForeignKey('project.id'),  nullable=False)
 
     cluster = db.relationship("Cluster")
     project = db.relationship("Project")
     account = db.relationship("Account")
 
+    __table_args__ = (
+        db.Index('namespace_idx', 'cluster_id', 'project_id', unique=True),
+    )
+
+
     def __repr__(self):
-        return self.name 
-
-
-    
-
+        return "{}:{}".format(self.cluster.name, self.project.name)

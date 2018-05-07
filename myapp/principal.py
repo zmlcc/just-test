@@ -19,13 +19,14 @@ def load_identity_from_header():
     
     current_user = User.query.filter_by(name=user_name).first()
     if current_user is None:
-        current_app.logger.info('add db username {}'.format(user_name))
-        user = User()
-        user.name = user_name
-        db.session().add(user)
-        db.session().commit()
-    else:
-        current_app.logger.info("get current_user {}".format(current_user))
+        # current_app.logger.info('add db username {}'.format(user_name))
+        # user = User()
+        # user.name = user_name
+        # db.session().add(user)
+        # db.session().commit()
+        return None
+    # else:
+    #     current_app.logger.info("get current_user {}".format(current_user))
     
     identity = Identity(user_name)
     if hasattr(current_user, 'role'):

@@ -8,6 +8,8 @@ import base64
 
 from ..model import db, Cluster
 
+from .ns import create_namespace, delete_namespace
+
 _client_cache = dict()
 
 _temp_files = {}
@@ -42,16 +44,20 @@ def _create_temp_file_with_content(content):
 def get_cli(cluster_name):
     global _client_cache
     if cluster_name in _client_cache:
-        return _client_cache[cluster_name]
+        return _client_cache.get(cluster_name, None)
 
     cluster = Cluster.query.filter_by(name=cluster_name).first()
     if cluster is None:
         return None
 
+    # print(cluster.cert)
+    # print(cluster.access_token)
+
     cfg = Configuration()
+    # cfg.debug = True
     cfg.host = cluster.addr
     cfg.ssl_ca_cert = _create_temp_file_with_content(
-        base64.decodestring(cluster.cert))
+        base64.b64decode(cluster.cert))
     cfg.api_key['authorization'] = "Bearer {}".format(cluster.access_token)
 
     api = ApiClient(cfg)
