@@ -28,14 +28,15 @@ class Base(db.Model):
     __abstract__ = True
 
     @declared_attr
-    def gmt_create(cls):
+    def gmt_create(cls): # pylint: disable=e0213
         return db.deferred(
             db.Column(db.DateTime, server_default=db.func.now()))
 
     # gmt_create = db.Column(db.DateTime, server_default=db.func.now())
 
+
     @declared_attr
-    def gmt_modified(cls): 
+    def gmt_modified(cls):   # pylint: disable=e0213
         return db.deferred(
             db.Column(
                 db.DateTime,
@@ -98,7 +99,7 @@ class Account(Base):
     id = db.Column(db.Integer, primary_key=True)
     # name = db.Column(db.String(80), unique=True)
 
-    token = db.Column(db.Text(1000))
+    token = deferred(db.Column(db.Text(2048)))
 
     cluster_id = db.Column(db.Integer, db.ForeignKey('cluster.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -106,6 +107,11 @@ class Account(Base):
 
     cluster = db.relationship("Cluster")
     user = db.relationship("User")
+    namespace = db.relationship("Namespace")
+
+    __table_args__ = (
+        db.Index('namespace_idx', 'cluster_id', 'user_id', unique=True),
+    )
 
     def __repr__(self):
         return "{}@{}".format(self.user.name, self.cluster.name)

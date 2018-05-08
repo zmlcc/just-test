@@ -4,16 +4,18 @@ from flask_sqlalchemy import get_debug_queries
 
 api = Blueprint('api', __name__)
 
-from .user import *
-from .cluster import *
-from .project import *
+
+from . import user
+from . import cluster
+from . import project
+from . import account
 
 
-# @api.after_request
-# def show_sql(response):
-#     for query in get_debug_queries():
-#         print(query)
-#         print()
-#         print()
+@api.after_request
+def show_sql(response):
+    for query in get_debug_queries():
+        print(query)
+        print()
+        print()
 
-#     return response
+    return response

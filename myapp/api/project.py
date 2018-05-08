@@ -17,7 +17,7 @@ from sqlalchemy.orm import defer
 
 @api.route("/project", methods=["GET"])
 def get_project():
-    prj = Project.query.filter(User.name==g.cur_user_name).all()
+    prj = Project.query.join(Project.user).filter(User.name==g.cur_user_name).all()
     if 0 == len(prj):
         return "", 400
     output = [item.name for item in prj]
@@ -108,7 +108,8 @@ def bind_project_cluster(prj_name, cluster_name):
     if cli is None:
         return "", 400
 
-    create_ns = create_namespace_wrapper(cli, prj_name)(create_namespace)
+    create_ns = create_namespace
+    create_ns = create_namespace_wrapper(cli, prj_name)(create_ns)
     rsp = create_ns(prj, cluster)
     if rsp is None:
         return "", 400
@@ -122,7 +123,6 @@ def create_namespace(prj, cluster):
     ns.cluster = cluster
 
     try:
-        Namespace
         db.session().add(ns)
         db.session().commit() 
     except exc.SQLAlchemyError as e:
