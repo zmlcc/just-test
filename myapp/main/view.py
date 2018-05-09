@@ -4,7 +4,7 @@ from . import main
 from ..model import db, User, Project
 from ..principal import create_user_permission
 
-from ..k8sclient import get_cli
+from ..k8s import get_cli
 from kubernetes.client import CoreV1Api
 
 @main.route("/info")

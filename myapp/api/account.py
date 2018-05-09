@@ -7,8 +7,8 @@ from cerberus import Validator
 from sqlalchemy.orm import load_only
 from sqlalchemy import exc
 
-from .. import k8sclient as k8s
-
+from .. import k8s
+from .util import get_sa_name
 
 @api.route("/cluster/<cluster_name>/account", methods=["GET"])
 def get_cluster_account(cluster_name):
@@ -68,10 +68,6 @@ def create_cluster_account(cluster_name):
     return "", 204
 
 
-def get_sa_name(username):
-    return "u-{}".format(username)
-
-
 def create_account(cluster, user, token):
     acc = Account()
     acc.cluster = cluster
@@ -108,14 +104,18 @@ def create_account_wrapper(cli, sa_name):
     return wrapper
 
 
-def read_account_wrapper(cli, sa_name):
+def read_account_wrapper(cli, sa_name, count=5):
     def wrapper(func):
         def _wrapper(*args, **kwargs):
-            rsp = k8s.read_serviceaccount(cli, sa_name)
-            if rsp is None:
-                return None
+            for _ in range(count):
+                rsp = k8s.read_serviceaccount(cli, sa_name)
+                if rsp is None:
+                    return None
 
-            print(rsp)
+                print(rsp)
+
+                if rsp.secrets:
+                    break
 
             if not rsp.secrets:
                 return None

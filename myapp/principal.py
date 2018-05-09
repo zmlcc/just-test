@@ -15,9 +15,11 @@ def load_identity_from_header():
     g.cur_user_name = user_name
     current_app.logger.info('get username {}'.format(user_name))
     if user_name is None:
+        g.cur_user = None
         return None
     
     current_user = User.query.filter_by(name=user_name).first()
+    g.cur_user = current_user
     if current_user is None:
         # current_app.logger.info('add db username {}'.format(user_name))
         # user = User()

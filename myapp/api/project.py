@@ -11,9 +11,11 @@ from cerberus import Validator
 from sqlalchemy import exc
 
 
-from .. import k8sclient as k8s
+from .. import  k8s
 
 from sqlalchemy.orm import defer
+
+from .util import NS_BASE_ROLE
 
 @api.route("/project", methods=["GET"])
 def get_project():
@@ -108,7 +110,8 @@ def bind_project_cluster(prj_name, cluster_name):
     if cli is None:
         return "", 400
 
-    create_ns = create_namespace
+    create_ns = create_namespace_in_db
+    create_ns = create_role_wrapper(cli, prj_name, NS_BASE_ROLE)(create_ns)
     create_ns = create_namespace_wrapper(cli, prj_name)(create_ns)
     rsp = create_ns(prj, cluster)
     if rsp is None:
@@ -117,7 +120,7 @@ def bind_project_cluster(prj_name, cluster_name):
     return "", 204
 
 
-def create_namespace(prj, cluster):
+def create_namespace_in_db(prj, cluster):
     ns = Namespace()
     ns.project  = prj
     ns.cluster = cluster
@@ -148,3 +151,23 @@ def create_namespace_wrapper(cli, name):
 
         return _wrapper
     return wrapper
+
+
+
+
+def create_role_wrapper(cli, namespace, role):
+    def wrapper(func):
+        def _wrapper(*args, **kargs):
+            rsp = k8s.create_role(cli, namespace, role)
+            if rsp is None:
+                return None
+
+            rsp = func(*args, **kargs)
+            if rsp is None:
+                k8s.delete_role(cli, namespace, role.metadata.name)
+            
+            return rsp
+
+        return _wrapper
+    return wrapper
+

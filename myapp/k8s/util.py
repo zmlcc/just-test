@@ -1,19 +1,14 @@
-from kubernetes.client.configuration import Configuration
-from kubernetes.client.api_client import ApiClient
-
 import os
 import atexit
 import tempfile
 import base64
 
-from ..model import db, Cluster
 
-from .ns import create_namespace, delete_namespace
-from .sa import create_serviceaccount, delete_serviceaccount, read_serviceaccount, read_secret
-from .role import create_role, delete_role
+from kubernetes.client.configuration import Configuration
+from kubernetes.client.api_client import ApiClient
 
 
-DEFAULT_SA_NAMESPACE = "exuser"
+from ..model import Cluster
 
 _client_cache = dict()
 
@@ -54,9 +49,6 @@ def get_cli(cluster_name):
     cluster = Cluster.query.filter_by(name=cluster_name).first()
     if cluster is None:
         return None
-
-    # print(cluster.cert)
-    # print(cluster.access_token)
 
     cfg = Configuration()
     # cfg.debug = True

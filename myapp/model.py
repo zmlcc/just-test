@@ -32,9 +32,6 @@ class Base(db.Model):
         return db.deferred(
             db.Column(db.DateTime, server_default=db.func.now()))
 
-    # gmt_create = db.Column(db.DateTime, server_default=db.func.now())
-
-
     @declared_attr
     def gmt_modified(cls):   # pylint: disable=e0213
         return db.deferred(
@@ -95,6 +92,17 @@ class Project(Base):
         return self.name
 
 
+ns_acc = db.Table(
+    "namespace_account",
+    db.Column(
+        "namespace_id", db.Integer, db.ForeignKey("namespace.id"), primary_key=True),
+    db.Column(
+        "account_id",
+        db.Integer,
+        db.ForeignKey("account.id"),
+        primary_key=True),
+)
+
 class Account(Base):
     id = db.Column(db.Integer, primary_key=True)
     # name = db.Column(db.String(80), unique=True)
@@ -103,14 +111,15 @@ class Account(Base):
 
     cluster_id = db.Column(db.Integer, db.ForeignKey('cluster.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    namespace_id = db.Column(db.Integer, db.ForeignKey('namespace.id'))
+    # namespace_id = db.Column(db.Integer, db.ForeignKey('namespace.id'))
 
     cluster = db.relationship("Cluster")
     user = db.relationship("User")
-    namespace = db.relationship("Namespace")
+
+    namespace = db.relationship("Namespace", secondary=ns_acc, lazy="select")
 
     __table_args__ = (
-        db.Index('namespace_idx', 'cluster_id', 'user_id', unique=True),
+        db.Index('account_idx', 'cluster_id', 'user_id', unique=True),
     )
 
     def __repr__(self):
@@ -126,7 +135,8 @@ class Namespace(Base):
 
     cluster = db.relationship("Cluster")
     project = db.relationship("Project")
-    account = db.relationship("Account")
+
+    account = db.relationship("Account", secondary=ns_acc, lazy="select")
 
     __table_args__ = (
         db.Index('namespace_idx', 'cluster_id', 'project_id', unique=True),
