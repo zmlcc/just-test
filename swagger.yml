@@ -1,0 +1,158 @@
+---
+swagger: "2.0"
+info:
+  description: "uaek api"
+  version: "0.0.1"
+  title: "uaek api"
+host: "127.0.0.1:18080"
+basePath: "/api/v1"
+schemes:
+- "http"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+paths:
+  /cluster:
+    get:
+      summary: "get cluster list"
+      operationId: "cluster_list"
+      parameters:
+      - name: "organization_id"
+        in: "query"
+        description: "Id of organization"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "a list of cluster"
+          schema:
+            properties:
+              firstName:
+                type: string
+        404:
+          description: "Cluster does not exist."
+        500:
+          description: "An unexpected error occured."
+      x-swagger-router-controller: "swagger_server.controllers.cluster_list"
+  /user:
+    get:
+      responses:
+        200:
+          description: "a list of user name"
+          schema:
+            type: array
+            items:
+              type: string
+    post:
+      summary: creates a user
+      description: add a new user
+      parameters:
+        - name: user
+          in: body
+          description: the user to create.
+          schema:
+            required:
+              - name
+            properties:
+              name:
+                type: string
+              email:
+                type: string
+      responses:
+        204:
+          description: user succesfully created.
+        400:
+          description: user couldn't have been created.
+              
+  /user/{username}:
+    get:
+      parameters:
+        - name: username
+          in: path
+          required: true
+          type: string
+      responses:
+        # 200:
+        #   description: "user info"
+        #   shema:
+        #     name:
+        #       type: string
+        200:
+          description: user info
+          schema:
+            properties:
+              name:
+                type: string
+
+  /project:
+    post:
+      summary: creates a project
+      parameters:
+        - name: project
+          in: body
+          description: the project to create.
+          schema:
+            required:
+              - name
+            properties:
+              name:
+                type: string
+      responses:
+        204:
+          description: user succesfully created.
+        400:
+          description: user couldn't have been created.
+  
+  /project/{prjname}/cluster:
+    get:
+      description: get bound cluster
+      parameters:
+        - name: prjname
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: cluster info
+          schema:
+            properties:
+              name:
+                type: string
+    
+  /project/{prjname}/cluster/{clustername}:
+    post:
+      summary: creates a project
+      parameters:
+        - name: prjname
+          in: path
+          description: the project to bind.
+          required: true
+          type: string
+        - name: clustername
+          in: path
+          description: the cluster to bind.
+          required: true
+          type: string
+      responses:
+        204:
+          description: project and cluster succesfully bound.
+        400:
+          description: project and cluster could not be bound.
+          
+  /cluster/<cluster_name>/account:
+    get:
+      responses:
+        200:
+          description: get account info
+          schema:
+            properties:
+              cluster:
+                type: string
+              user:
+                type: string
+              token:
+                type: string
+        400:
+          description: project and cluster could not be bound.
+    
