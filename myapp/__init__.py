@@ -6,6 +6,7 @@ from .api import api
 from .principal import prin
 from .testbp import testbp
 
+from flask_cors import CORS
 
 def create_app(config_name):
     app = Flask(__name__)
@@ -14,6 +15,7 @@ def create_app(config_name):
     db.init_app(app)
     admin.init_app(app)
     prin.init_app(app)
+    CORS(app)
     app.register_blueprint(main, url_prefix="/testf/")
     app.register_blueprint(testbp)
     app.register_blueprint(api, url_prefix="/api")

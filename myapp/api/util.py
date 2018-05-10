@@ -9,16 +9,6 @@ def get_rb_name(role_name, sa_name):
     return "{}~{}".format(role_name, sa_name)
 
 
-# role = namedtuple("role", ["name", "rule"])
-
-# NS_BASE_ROLE_NAME = "r-base"
-
-# NS_BASE_ROLE = role(name="r-base", rule="")
-
-# meta = k8c.V1ObjectMeta(name="r-base")
-# rule = [
-#     k8c.V1PolicyRule(api_groups=["*"], resources=["*"], verbs=["*"]),
-# ]
 NS_BASE_ROLE = k8c.V1Role(
     api_version="rbac.authorization.k8s.io/v1",
     kind="Role",
@@ -27,3 +17,12 @@ NS_BASE_ROLE = k8c.V1Role(
         k8c.V1PolicyRule(api_groups=["*"], resources=["*"], verbs=["*"]),
     ],
 )
+
+
+def o2prj(project):
+    return dict(name=project.name)
+
+
+
+def o2user(user):
+    return dict(name=user.name)

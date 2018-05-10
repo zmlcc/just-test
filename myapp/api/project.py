@@ -16,13 +16,15 @@ from .. import  k8s
 from sqlalchemy.orm import defer
 
 from .util import NS_BASE_ROLE
+from .util import o2prj, o2user
+
 
 @api.route("/project", methods=["GET"])
 def get_project():
     prj = Project.query.join(Project.user).filter(User.name==g.cur_user_name).all()
     if 0 == len(prj):
         return "", 400
-    output = [item.name for item in prj]
+    output = [o2prj(item) for item in prj]
     return jsonify(output)
 
 
@@ -65,8 +67,10 @@ def get_project_user(prj_name):
 
     if prj is None:
         return "", 400
-    output = [item.name for item in prj.user]
+    output = [o2user(item) for item in prj.user]
     return jsonify(output)
+
+
 
 
 @api.route("/project/<prj_name>/user/<user_name>", methods=["POST"])

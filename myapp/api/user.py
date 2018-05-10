@@ -7,10 +7,21 @@ from cerberus import Validator
 
 from sqlalchemy import exc
 
+from .util import o2prj, o2user
 
 @api.route("/user", methods=['GET'])
 def get_all_user():
-    output = [item[0] for item in User.query.with_entities(User.name)]
+    output = []
+    try:
+        for item in User.query.with_entities(User.name):
+            output.append(
+                {
+                    "name": item[0]
+                }
+            )
+    except:
+        return "", 500
+    
     return jsonify(output)
 
 
@@ -22,9 +33,11 @@ def get_user(username):
 
     output = dict(
         name=user.name,
-        project=list(user.project),
+        project=[o2prj(item) for item in user.project],
     )
     return jsonify(output)
+
+
 
 
 user_schema = {
@@ -57,4 +70,4 @@ def creat_user():
     except exc.SQLAlchemyError:
         return "", 400
 
-    return "OK", 204
+    return "", 204

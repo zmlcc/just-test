@@ -5,7 +5,7 @@ info:
   version: "0.0.1"
   title: "uaek api"
 host: "127.0.0.1:18080"
-basePath: "/api/v1"
+basePath: "/api/"
 schemes:
 - "http"
 consumes:
@@ -16,37 +16,54 @@ paths:
   /cluster:
     get:
       summary: "get cluster list"
-      operationId: "cluster_list"
-      parameters:
-      - name: "organization_id"
-        in: "query"
-        description: "Id of organization"
-        required: true
-        type: "integer"
       responses:
         200:
           description: "a list of cluster"
           schema:
-            properties:
-              firstName:
-                type: string
-        404:
-          description: "Cluster does not exist."
+            type: array
+            items:
+              properties:
+                name:
+                  type: string
         500:
           description: "An unexpected error occured."
-      x-swagger-router-controller: "swagger_server.controllers.cluster_list"
+  /cluster/{cluster_name}:
+    get:
+      summary: "get cluster by name"
+      parameters:
+        - name: cluster_name
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: "cluster info"
+          schema:
+            properties:
+              name:
+                type: string
+              addr:
+                type: string
+              cert:
+                type: string
+        400:
+          description: cluster not found
+  
   /user:
     get:
       responses:
         200:
-          description: "a list of user name"
+          description: "a list of user name" 
           schema:
             type: array
             items:
-              type: string
+              properties:
+                name:
+                  type: string
+        500:
+          description: "An unexpected error occured."
     post:
       summary: creates a user
-      description: add a new user
       parameters:
         - name: user
           in: body
@@ -56,8 +73,6 @@ paths:
               - name
             properties:
               name:
-                type: string
-              email:
                 type: string
       responses:
         204:
@@ -73,19 +88,32 @@ paths:
           required: true
           type: string
       responses:
-        # 200:
-        #   description: "user info"
-        #   shema:
-        #     name:
-        #       type: string
         200:
           description: user info
           schema:
             properties:
               name:
                 type: string
+              project:
+                type: array
+                items:
+                  properties:
+                    name:
+                      type: string
 
   /project:
+    get:
+      responses:
+        200:
+          description: project info
+          schema:
+            type: array
+            items:
+              properties:
+                name:
+                  type: string
+        500:
+          description: "An unexpected error occured."
     post:
       summary: creates a project
       parameters:
@@ -100,9 +128,44 @@ paths:
                 type: string
       responses:
         204:
+          description: project succesfully created.
+        400:
+          description: project couldn't have been created.
+          
+  /project/{prjname}/user:
+    get:
+      description: get project user
+      parameters:
+        - name: prjname
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: user info
+          schema:
+            properties:
+              name:
+                type: string
+                
+  /project/{prjname}/user/{username}:
+    post:
+      summary: add a user
+      parameters:
+        - name: prjname
+          in: path
+          required: true
+          type: string
+        - name: username
+          in: path
+          required: true
+          type: string
+      responses:
+        204:
           description: user succesfully created.
         400:
           description: user couldn't have been created.
+          
   
   /project/{prjname}/cluster:
     get:

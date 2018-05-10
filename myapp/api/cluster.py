@@ -9,9 +9,13 @@ from sqlalchemy.orm import load_only
 @api.route("/cluster", methods=['GET'])
 def get_all_cluster():
     try:
-        output = [
-            item[0] for item in Cluster.query.with_entities(Cluster.name)
-        ]
+        output = []
+        for item in Cluster.query.with_entities(Cluster.name):
+            output.append(
+                {
+                    "name": item[0]
+                }
+            )
     except:
         return "", 500
     else:
