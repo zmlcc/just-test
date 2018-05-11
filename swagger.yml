@@ -203,7 +203,12 @@ paths:
         400:
           description: project and cluster could not be bound.
           
-  /cluster/<cluster_name>/account:
+  /cluster/{cluster_name}/account:
+    parameters:
+      - name: cluster_name
+        in: path
+        required: true
+        type: string
     get:
       responses:
         200:
@@ -217,5 +222,50 @@ paths:
               token:
                 type: string
         400:
-          description: project and cluster could not be bound.
+          description: not found
+    post:
+      responses:
+        204:
+          description: account succesfully created.
+        400:
+          description: not found
+          
+          
+  /cluster/{cluster_name}/namespace:
+    parameters:
+      - name: cluster_name
+        in: path
+        required: true
+        type: string
+    get:
+      responses:
+        200:
+          description: get cluster namesapce
+          schema:
+            type: array
+            items:
+              properties:
+                name:
+                  type: string
+        400:
+          description: not found
+          
+          
+  /cluster/{cluster_name}/permit/{ns_name}:
+    parameters:
+      - name: cluster_name
+        in: path
+        required: true
+        type: string
+      - name: ns_name
+        in: path
+        required: true
+        type: string
+    post:
+      responses:
+        204:
+          description: permit succesfully created.
+        400:
+          description: not found
+    
     

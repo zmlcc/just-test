@@ -48,7 +48,7 @@ def get_cluster_namespace(cluster_name):
     if ns is None:
         return "", 400
 
-    output = [ item.project.name for item in ns]
+    output = [ dict(name=item.project.name) for item in ns]
 
     return jsonify(output)
 
