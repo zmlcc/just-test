@@ -49,6 +49,28 @@ def create_permit(cluster_name, ns_name):
 
     return "", 204
 
+@api.route("/cluster/<cluster_name>/permit", methods=["GET"])
+def get_all_permit(cluster_name):
+    if g.cur_user is None:
+        return "", 400
+
+    cluster = Cluster.query.filter_by(name=cluster_name).first()
+    if cluster is None:
+        return "", 400
+
+    acc = Account.query.filter(Account.user == g.cur_user).filter(Account.cluster == cluster).first()
+    if acc is None:
+        return "", 400
+
+    ns = Namespace.query.filter(Namespace.cluster == cluster).filter(Namespace.account.contains(acc))
+
+    output = []
+
+    for item in ns:
+        output.append(dict(namespace=item.project.name))
+
+    return jsonify(output)
+    
 
     
 def create_sa_rb_wrapper(cli, ns, role_name, sa_name):

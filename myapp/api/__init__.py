@@ -9,7 +9,7 @@ from . import user
 from . import cluster
 from . import project
 from . import account
-from . import premit
+from . import permit
 
 
 # @api.after_request

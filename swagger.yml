@@ -267,5 +267,25 @@ paths:
           description: permit succesfully created.
         400:
           description: not found
+          
+          
+  /cluster/{cluster_name}/permit/:
+    parameters:
+      - name: cluster_name
+        in: path
+        required: true
+        type: string
+    get:
+      responses:
+        200:
+          description: all permitted namespace in the cluster
+          schema:
+            type: array
+            items:
+              properties:
+                namespace:
+                  type: string
+        400:
+          description: not found
     
     
