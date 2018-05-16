@@ -8,6 +8,8 @@ prin = Principal()
 
 create_user_permission = Permission(RoleNeed('create_user'))
 
+mananger_permission = Permission(RoleNeed('manager'))
+
 
 @prin.identity_loader
 def load_identity_from_header():

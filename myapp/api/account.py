@@ -31,7 +31,7 @@ def get_cluster_account(cluster_name):
     #         Cluster.name == cluster_name).first()
 
     if acc is None:
-        return "", 400
+        return "", 204
 
     output = dict(cluster=cluster_name, user=g.cur_user_name, token=acc.token)
 
