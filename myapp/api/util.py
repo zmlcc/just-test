@@ -23,6 +23,8 @@ def o2prj(project):
     return dict(name=project.name)
 
 
+def o2role(role):
+    return dict(name=role.name)
 
 def o2user(user):
     return dict(name=user.name)

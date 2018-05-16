@@ -12,40 +12,29 @@ from .util import get_sa_name
 
 @api.route("/cluster/<cluster_name>/account", methods=["GET"])
 def get_cluster_account(cluster_name):
-    if g.cur_user_name is None:
+    if g.cur_user is None:
         return "", 400
 
-    user = User.query.filter(User.name==g.cur_user_name).first()
-    if user is None:
-        return "", 400
 
     cluster = Cluster.query.filter_by(name=cluster_name).first()
     if cluster is None:
         return "", 400
 
-    acc = Account.query.filter(Account.user == user).filter(Account.cluster == cluster).first()
-
-    # acc = Account.query.join(
-    #     Account.user,
-    #     Account.cluster).filter(User.name == g.cur_user_name).filter(
-    #         Cluster.name == cluster_name).first()
+    acc = Account.query.filter(Account.user == g.cur_user).filter(Account.cluster == cluster).first()
 
     if acc is None:
         return "", 204
 
-    output = dict(cluster=cluster_name, user=g.cur_user_name, token=acc.token)
+    output = dict(cluster=cluster_name, user=g.cur_user.name, token=acc.token)
 
     return jsonify(output)
 
 
 @api.route("/cluster/<cluster_name>/account", methods=["POST"])
 def create_cluster_account(cluster_name):
-    if g.cur_user_name is None:
+    if g.cur_user is None:
         return "", 400
 
-    user = User.query.filter(User.name == g.cur_user_name).first()
-    if user is None:
-        return "", 400
 
     cluster = Cluster.query.filter_by(name=cluster_name).first()
     if cluster is None:
@@ -55,13 +44,13 @@ def create_cluster_account(cluster_name):
     if cli is None:
         return "", 400
 
-    sa_name = get_sa_name(g.cur_user_name)
+    sa_name = get_sa_name(g.cur_user.name)
 
     create_acc = create_account
 
     create_acc = read_account_wrapper(cli, sa_name)(create_acc)
     create_acc = create_account_wrapper(cli, sa_name)(create_acc)
-    rsp = create_acc(cluster, user)
+    rsp = create_acc(cluster, g.cur_user)
     if rsp is None:
         return "", 400
 

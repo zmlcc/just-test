@@ -14,10 +14,12 @@ from ..principal import mananger_permission
 
 @api.route("/project", methods=["GET"])
 def get_project():
-    prj = Project.query.join(
-        Project.user).filter(User.name == g.cur_user_name).all()
-    if 0 == len(prj):
+    if g.cur_user is None:
         return "", 400
+
+    prj = Project.query.filter(Project.user.contains(g.cur_user)).all()
+    if 0 == len(prj):
+        return "", 204
     output = [o2prj(item) for item in prj]
     return jsonify(output)
 
@@ -29,7 +31,7 @@ project_schema = {"name": {'required': True, 'type': 'string'}}
 @api.route("/project", methods=["POST"])
 @mananger_permission.require(403)
 def add_project():
-    if g.cur_user_name is None:
+    if g.cur_user is None:
         return "", 400
 
     input = request.get_json()
@@ -42,8 +44,7 @@ def add_project():
     prj = Project()
     prj.name = input["name"]
     try:
-        user = User.query.filter_by(name=g.cur_user_name).first()
-        prj.user.append(user)
+        prj.user.append(g.cur_user)
         db.session().add(prj)
         db.session().commit()
     except exc.SQLAlchemyError:
@@ -54,8 +55,10 @@ def add_project():
 
 @api.route("/project/<prj_name>/user", methods=["GET"])
 def get_project_user(prj_name):
-    prj = Project.query.join(Project.user).filter(
-        User.name == g.cur_user_name).filter(Project.name == prj_name).first()
+    if g.cur_user is None:
+        return "", 400
+
+    prj = Project.query.filter(Project.user.contains(g.cur_user)).filter(Project.name == prj_name).first()
 
     if prj is None:
         return "", 400
@@ -66,8 +69,9 @@ def get_project_user(prj_name):
 @api.route("/project/<prj_name>/user/<user_name>", methods=["POST"])
 @mananger_permission.require(403)
 def add_project_user(prj_name, user_name):
-    prj = Project.query.join(Project.user).filter(
-        User.name == g.cur_user_name).filter(Project.name == prj_name).first()
+    if g.cur_user is None:
+        return "", 400
+    prj = Project.query.filter(Project.user.contains(g.cur_user)).filter(Project.name == prj_name).first()
     if prj is None:
         return "", 400
     user = User.query.filter(User.name == user_name).first()
@@ -85,8 +89,9 @@ def add_project_user(prj_name, user_name):
 @api.route("/project/<prj_name>/cluster", methods=["GET"])
 @mananger_permission.require(403)
 def get_project_cluster(prj_name):
-    prj = Project.query.join(Project.user).filter(
-        User.name == g.cur_user_name).filter(Project.name == prj_name).first()
+    if g.cur_user is None:
+        return "", 400
+    prj = Project.query.filter(Project.user.contains(g.cur_user)).filter(Project.name == prj_name).first()
     if prj is None:
         return "", 400
 
@@ -101,8 +106,9 @@ def get_project_cluster(prj_name):
 @api.route("/project/<prj_name>/cluster/<cluster_name>", methods=["POST"])
 @mananger_permission.require(403)
 def bind_project_cluster(prj_name, cluster_name):
-    prj = Project.query.join(Project.user).filter(
-        User.name == g.cur_user_name).filter(Project.name == prj_name).first()
+    if g.cur_user is None:
+        return "", 400
+    prj = Project.query.filter(Project.user.contains(g.cur_user)).filter(Project.name == prj_name).first()
     if prj is None:
         return "", 400
 

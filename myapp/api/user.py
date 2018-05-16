@@ -7,7 +7,7 @@ from cerberus import Validator
 
 from sqlalchemy import exc
 
-from .util import o2prj, o2user
+from .util import o2prj, o2user, o2role
 
 @api.route("/user", methods=['GET'])
 def get_all_user():
@@ -34,6 +34,7 @@ def get_user(username):
     output = dict(
         name=user.name,
         project=[o2prj(item) for item in user.project],
+        role=[o2role(item) for item in user.role],
     )
     return jsonify(output)
 

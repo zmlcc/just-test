@@ -42,7 +42,7 @@ def get_cluster_namespace(cluster_name):
     if cluster is None:
         return "", 400
 
-    subq = Project.query.join(Project.user).filter(User.name==g.cur_user_name).options(load_only("id")).subquery()
+    subq = Project.query.filter(Project.user==g.cur_user).options(load_only("id")).subquery()
     ns = Namespace.query.join(Namespace.cluster).join(subq).filter(Cluster.name==cluster_name)
 
     if ns is None:
