@@ -35,6 +35,7 @@ def add_project():
         return "", 400
 
     input = request.get_json()
+    current_app.logger.info(input)
     if input is None:
         return "", 400
     v = Validator(project_schema, allow_unknown=True)
@@ -47,8 +48,9 @@ def add_project():
         prj.user.append(g.cur_user)
         db.session().add(prj)
         db.session().commit()
-    except exc.SQLAlchemyError:
-        return "", 400
+    except exc.SQLAlchemyError as e:
+        current_app.logger.error(e)
+        return "", 409
 
     return "", 204
 

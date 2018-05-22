@@ -1,8 +1,9 @@
 Flask_SQLAlchemy==2.3.2
-Cerberus==1.2
-click==6.7
-kubernetes==6.0.0
-SQLAlchemy==1.2.6
 Flask==1.0.1
+Cerberus==1.2
+Flask_Cors==3.0.4
 Flask_Principal==0.4.0
+SQLAlchemy==1.2.6
+click==6.7
 Flask_Admin==1.5.1
+kubernetes==6.0.0

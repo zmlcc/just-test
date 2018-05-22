@@ -13,6 +13,19 @@ consumes:
 produces:
 - "application/json"
 paths:
+  /whoami:
+    get:
+      responses:
+        200:
+          description: "cluster info"
+          schema:
+            properties:
+              username:
+                type: string
+              registered:
+                type: boolean
+
+
   /cluster:
     get:
       summary: "get cluster list"

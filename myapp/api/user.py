@@ -1,4 +1,4 @@
-from flask import jsonify, request
+from flask import jsonify, request, g, current_app
 from . import api
 
 from ..model import db, User
@@ -8,6 +8,20 @@ from cerberus import Validator
 from sqlalchemy import exc
 
 from .util import o2prj, o2user, o2role
+
+from ..principal import prin
+
+
+@api.route("/whoami", methods=['GET'])
+def whoami():
+    current_app.logger.error(current_app.before_request_funcs["api"][0])
+    current_app.logger.error(prin.identity_loaders)
+    current_app.logger.error(g)
+    output = dict(
+        username = request.headers.get("Remote-User", ""),
+        registered = False if g.cur_user is None else True
+    )
+    return jsonify(output)
 
 @api.route("/user", methods=['GET'])
 def get_all_user():
@@ -21,6 +35,10 @@ def get_all_user():
             )
     except:
         return "", 500
+
+    # output.append([item for item in current_app.before_request_funcs])
+    current_app.logger.error(current_app.before_request_funcs["api"][0])
+    current_app.logger.error(prin.identity_loaders)
     
     return jsonify(output)
 
