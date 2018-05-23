@@ -4,7 +4,6 @@ from .model import db
 from .main import main
 from .admin import admin
 from .api import api
-from .testbp import testbp
 
 from flask_cors import CORS
 
@@ -18,7 +17,6 @@ def create_app(config_name):
     prin.init_app(api)
     CORS(app)
     app.register_blueprint(main, url_prefix="/testf/")
-    # app.register_blueprint(testbp)
     app.register_blueprint(api, url_prefix="/testf/zoo/api")
 
     return app
