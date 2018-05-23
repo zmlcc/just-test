@@ -1,5 +1,5 @@
 
-DEFAULT_SA_NAMESPACE = "exuser"
+DEFAULT_SA_NAMESPACE = "user-test"
 
 from .util import get_cli
 from .ns import create_namespace, delete_namespace

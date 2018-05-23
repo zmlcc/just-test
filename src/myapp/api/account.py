@@ -1,3 +1,4 @@
+import time
 from flask import jsonify, request, g, current_app
 from . import api
 
@@ -10,17 +11,18 @@ from sqlalchemy import exc
 from .. import k8s
 from .util import get_sa_name
 
+
 @api.route("/cluster/<cluster_name>/account", methods=["GET"])
 def get_cluster_account(cluster_name):
     if g.cur_user is None:
         return "", 400
 
-
     cluster = Cluster.query.filter_by(name=cluster_name).first()
     if cluster is None:
         return "", 400
 
-    acc = Account.query.filter(Account.user == g.cur_user).filter(Account.cluster == cluster).first()
+    acc = Account.query.filter(Account.user == g.cur_user).filter(
+        Account.cluster == cluster).first()
 
     if acc is None:
         return "", 204
@@ -34,7 +36,6 @@ def get_cluster_account(cluster_name):
 def create_cluster_account(cluster_name):
     if g.cur_user is None:
         return "", 400
-
 
     cluster = Cluster.query.filter_by(name=cluster_name).first()
     if cluster is None:
@@ -93,7 +94,7 @@ def create_account_wrapper(cli, sa_name):
     return wrapper
 
 
-def read_account_wrapper(cli, sa_name, count=5):
+def read_account_wrapper(cli, sa_name, count=10):
     def wrapper(func):
         def _wrapper(*args, **kwargs):
             for _ in range(count):
@@ -105,6 +106,8 @@ def read_account_wrapper(cli, sa_name, count=5):
 
                 if rsp.secrets:
                     break
+
+                time.sleep(0.2)
 
             if not rsp.secrets:
                 return None
