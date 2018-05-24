@@ -4,7 +4,7 @@ from flask_admin.contrib.sqla import ModelView
 from ..model import db, User, Project, Cluster, Role, Account, Namespace
 
 
-admin = Admin(url="/testf/admin")
+admin = Admin()
 
 
 class BaseModelView(ModelView):

@@ -2,7 +2,7 @@
 import os
 import click
 from myapp import create_app
-from myapp.model import db, Project
+from myapp.model import db
 
 
 

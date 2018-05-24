@@ -105,13 +105,13 @@ ns_acc = db.Table(
 
 class Account(Base):
     id = db.Column(db.Integer, primary_key=True)
-    # name = db.Column(db.String(80), unique=True)
+
 
     token = deferred(db.Column(db.Text(2048)))
 
     cluster_id = db.Column(db.Integer, db.ForeignKey('cluster.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    # namespace_id = db.Column(db.Integer, db.ForeignKey('namespace.id'))
+
 
     cluster = db.relationship("Cluster")
     user = db.relationship("User")
