@@ -1,12 +1,9 @@
 import time
-from flask import jsonify, request, g, current_app
+from flask import jsonify, g, current_app
+from sqlalchemy import exc
 from . import api
 
-from ..model import db, Cluster, Namespace, User, Project, Account
-
-from cerberus import Validator
-from sqlalchemy.orm import load_only
-from sqlalchemy import exc
+from ..model import db, Cluster, Account
 
 from .. import k8s
 from .util import get_sa_name
@@ -65,8 +62,8 @@ def create_account(cluster, user, token):
     acc.token = token
 
     try:
-        db.session().add(acc)
-        db.session().commit()
+        db.session.add(acc)
+        db.session.commit()
     except exc.SQLAlchemyError as e:
         current_app.logger.error(e)
         return None
@@ -77,15 +74,18 @@ def create_account(cluster, user, token):
 def create_account_wrapper(cli, sa_name):
     def wrapper(func):
         def _wrapper(*args, **kwargs):
-            rsp = k8s.create_serviceaccount(cli, sa_name)
+            ns=current_app.config.get("UAE_SA_NS", "")
+            if ns is "":
+                return None
+            rsp = k8s.create_serviceaccount(cli, sa_name, ns)
             if rsp is None:
                 return None
 
-            print(rsp)
+            current_app.logger.debug("create_serviceaccount:", rsp)
 
             rsp = func(*args, **kwargs)
             if rsp is None:
-                k8s.delete_serviceaccount(cli, sa_name)
+                k8s.delete_serviceaccount(cli, sa_name, ns)
 
             return rsp
 
@@ -97,12 +97,15 @@ def create_account_wrapper(cli, sa_name):
 def read_account_wrapper(cli, sa_name, count=10):
     def wrapper(func):
         def _wrapper(*args, **kwargs):
+            ns=current_app.config.get("UAE_SA_NS", "")
+            if ns is "":
+                return None
             for _ in range(count):
-                rsp = k8s.read_serviceaccount(cli, sa_name)
+                rsp = k8s.read_serviceaccount(cli, sa_name, ns)
                 if rsp is None:
                     return None
 
-                print(rsp)
+                current_app.logger.debug("read_serviceaccount:", rsp)
 
                 if rsp.secrets:
                     break
@@ -114,9 +117,10 @@ def read_account_wrapper(cli, sa_name, count=10):
 
             token_name = rsp.secrets[0].name
 
-            rsp = k8s.read_secret(cli, token_name)
+            rsp = k8s.read_secret(cli, token_name, ns)
 
-            print(rsp)
+            current_app.logger.debug("read_secret:", rsp)
+
 
             token = rsp.data.get('token', "")
 

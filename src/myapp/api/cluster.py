@@ -1,21 +1,16 @@
 from flask import jsonify, request, g
+from sqlalchemy.orm import load_only
 from . import api
 
-from ..model import db, Cluster, Namespace, User, Project, Account
+from ..model import Cluster, Namespace, Project
 
-from cerberus import Validator
-from sqlalchemy.orm import load_only
 
 @api.route("/cluster", methods=['GET'])
 def get_all_cluster():
     try:
         output = []
         for item in Cluster.query.with_entities(Cluster.name):
-            output.append(
-                {
-                    "name": item[0]
-                }
-            )
+            output.append({"name": item[0]})
     except:
         return "", 500
     else:
@@ -42,13 +37,14 @@ def get_cluster_namespace(cluster_name):
     if cluster is None:
         return "", 400
 
-    subq = Project.query.filter(Project.user.contains(g.cur_user)).options(load_only("id")).subquery()
-    ns = Namespace.query.join(Namespace.cluster).join(subq).filter(Cluster.name==cluster_name)
+    subq = Project.query.filter(Project.user.contains(g.cur_user)).options(
+        load_only("id")).subquery()
+    ns = Namespace.query.join(
+        Namespace.cluster).join(subq).filter(Cluster.name == cluster_name)
 
     if ns is None:
         return "", 400
 
-    output = [ dict(name=item.project.name) for item in ns]
+    output = [dict(name=item.project.name) for item in ns]
 
     return jsonify(output)
-

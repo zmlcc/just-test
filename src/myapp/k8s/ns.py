@@ -4,7 +4,8 @@ import kubernetes.client as k8c
 from kubernetes.client.rest import ApiException
 
 def create_namespace(cli, name):
-    print("create_namespace", name)
+    current_app.logger.debug("create_namespace:", name)
+    
     api = k8c.CoreV1Api(cli)
     meta = k8c.V1ObjectMeta(name=name)
     body = k8c.V1Namespace(metadata=meta)
@@ -17,7 +18,7 @@ def create_namespace(cli, name):
     
     
 def delete_namespace(cli, name):
-    print("delete_namespace", name)
+    current_app.logger.debug("delete_namespace:", name)
     
     api = k8c.CoreV1Api(cli)
     body = k8c.V1DeleteOptions(grace_period_seconds=0)

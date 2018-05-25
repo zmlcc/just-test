@@ -1,6 +1,7 @@
-from flask import Flask
-from .principal import prin
+import logging
+from flask import Flask, jsonify
 from .model import db
+from .principal import prin
 from .admin import admin
 from .api import api
 
@@ -12,11 +13,16 @@ def create_app(config_name):
     app.secret_key = 'NGE0YmQzZjItMDY0Yi00MWE3LThjM2UtNjNmMWM1NzQ4NTI4Cg'
     CORS(app)
     db.init_app(app)
+    prin.init_app(api)
     admin.init_app(app, url="/admin")
     app.register_blueprint(api, url_prefix="/api")
 
-    prin.init_app(api)
-    prin.init_app(admin)
+    app.logger.setLevel(logging.INFO)
+ 
+    for k, v in app.config.items():
+        app.logger.info("{}: {}".format(k ,v))  # pylint: disable=e1101
 
     return app
+
+
 

@@ -1,6 +1,4 @@
 
-DEFAULT_SA_NAMESPACE = "user-test"
-
 from .util import get_cli
 from .ns import create_namespace, delete_namespace
 from .sa import create_serviceaccount, delete_serviceaccount, read_serviceaccount, read_secret

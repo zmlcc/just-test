@@ -3,11 +3,9 @@ import kubernetes.client as k8c
 
 from kubernetes.client.rest import ApiException
 
-from . import DEFAULT_SA_NAMESPACE
 
-
-def create_serviceaccount(cli, name, ns=DEFAULT_SA_NAMESPACE):
-    print("create_serviceaccount", name)
+def create_serviceaccount(cli, name, ns):
+    current_app.logger.debug("create_serviceaccount:", name, ns)
     
     api = k8c.CoreV1Api(cli)
     meta = k8c.V1ObjectMeta(name=name)
@@ -21,9 +19,9 @@ def create_serviceaccount(cli, name, ns=DEFAULT_SA_NAMESPACE):
         return None
 
 
-def delete_serviceaccount(cli, name, ns=DEFAULT_SA_NAMESPACE):
-    print("delete_serviceaccount", name)
-
+def delete_serviceaccount(cli, name, ns):
+    current_app.logger.debug("delete_serviceaccount:", name, ns)
+    
     api = k8c.CoreV1Api(cli)
     body = k8c.V1DeleteOptions(grace_period_seconds=0)
     try:
@@ -36,8 +34,8 @@ def delete_serviceaccount(cli, name, ns=DEFAULT_SA_NAMESPACE):
 
 
 
-def read_serviceaccount(cli, name, ns=DEFAULT_SA_NAMESPACE):
-    print('read_serviceaccount')
+def read_serviceaccount(cli, name, ns):
+    current_app.logger.debug("read_serviceaccount:", name, ns)
 
     api = k8c.CoreV1Api(cli)
     
@@ -48,8 +46,9 @@ def read_serviceaccount(cli, name, ns=DEFAULT_SA_NAMESPACE):
         current_app.logger.error(e)
         return None
 
-def read_secret(cli, name, ns=DEFAULT_SA_NAMESPACE):
-    print('read_secret')
+def read_secret(cli, name, ns):
+    current_app.logger.debug("read_secret:", name, ns)
+    
 
     api = k8c.CoreV1Api(cli)
     

@@ -1,11 +1,19 @@
+from flask import g
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 
 from ..model import db, User, Project, Cluster, Role, Account, Namespace
 
+from ..principal import admin_permission, load_identity_from_header
 
 admin = Admin()
 
+
+def can_access_admin():
+    identity = load_identity_from_header()
+    if identity is None:
+        return False
+    return identity.can(admin_permission)
 
 class BaseModelView(ModelView):
     column_display_all_relations = True
@@ -14,6 +22,12 @@ class BaseModelView(ModelView):
     action_disallowed_list = ['delete']
     column_exclude_list = ['gmt_create', 'gmt_modified' ]
     form_excluded_columns = ['gmt_create', 'gmt_modified' ]
+
+    def is_accessible(self):
+        return True
+        if not hasattr(g, "can_access_admin"):
+            g.can_access_admin = can_access_admin()
+        return g.can_access_admin
 
 
 class ClusterView(BaseModelView):
