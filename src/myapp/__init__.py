@@ -1,4 +1,5 @@
 import logging
+from os import path
 from flask import Flask, jsonify
 from .model import db
 from .principal import prin
@@ -14,8 +15,10 @@ def create_app(config_name):
     CORS(app)
     db.init_app(app)
     prin.init_app(api)
-    admin.init_app(app, url="/admin")
-    app.register_blueprint(api, url_prefix="/api")
+    
+    prefix = app.config.get("APP_ROOT", "/")
+    admin.init_app(app, url=prefix+"/admin")
+    app.register_blueprint(api, url_prefix=prefix+"/api")
 
     app.logger.setLevel(logging.INFO)
  

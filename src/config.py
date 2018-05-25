@@ -5,3 +5,4 @@ UAE_SA_NS = "user-ext"
 UAE_BASE_CR = "cr-uae-ns"
 
 PROJECT_QUOTA = 1
+APP_ROOT = "/zoo"

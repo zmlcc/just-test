@@ -119,6 +119,8 @@ paths:
                   properties:
                     name:
                       type: string
+              project_quota:
+                type: string
 
   /project:
     get:

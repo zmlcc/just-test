@@ -28,8 +28,7 @@ FROM base
 COPY --from=builder /install /usr
 COPY /src /app
 WORKDIR /app
-CMD ["ls", "/app"]
-CMD ["uwsgi", "--http-socket", ":8080", "--manage-script-name", "--mount", "/app=run:app", "--plugin=python3", "--processes 4", "--threads=2"]
+CMD ["uwsgi", "--http-socket", ":8080", "--manage-script-name", "--mount", "/app=run:app", "--plugin=python3", "--processes=4", "--threads=2"]
 
 
 
